@@ -101,7 +101,7 @@ For more dataset information, please go through the following link:
 - 经过文本处理之后的云图显示（训练集左，测试集右）：
 
 ## 模型描述
-
+**tip:模型并不复杂,可以参见代码**
 ### RNN
 - 使用LSTM进行训练和测试，在进入模型之后第一步进行embedding词嵌入操作，并将`PAD`设为零向量。
 - 具体创建LSTM语句如下：
@@ -109,5 +109,62 @@ For more dataset information, please go through the following link:
 self.rnn = torch.nn.LSTM(input_size=d_embedding, hidden_size=d_hidden, num_layers=num_layers, batch_first=True,
                                  dropout=dropout, bidirectional=True)
 ```
-- 对最后一次
+- 对最后一次循环得到的输出经过一个线性层映射到输出类别的维度。
+
 ### Transformer
+- 仅保留Encoder部分用于分类
+- 输入为二维向量，首先经过Embedding层将每个时间步变成稠密向量，维度变为`(batch_size, time_step, d_embedding)`。
+- 经过Encoder栈，对每个时间步进行attention计算。
+- 最后经过线性层，将输出映射为类别维度。
+
+
+## 实验结果
+模型|测试集准确率|训练集准确率|
+----|-----------|-----------|
+RNN|89.88%|99.87%|
+Transformer|85.68%|99.57%|
+
+- RNN模型的准确率略胜一筹，当然本人在实验时将大量的实验时间花在了RNN模型上，对模型的参数调整花了比较多的时间，也是为了能够更加了解RNN一些，在Transformer模型的参数调整和模型的微调上还有待更多的的实验。
+- 两个模型均存在严重的过拟合。
+- RNN网络中，使用LSTM模块、使用多层RNN网络、使用双向循环神经网络均会使训练时间大幅度增加，相比较而言，Transformer模型的训练速度较快。当然这是建立在处理的句子长度在计算机的计算能力之内的情况下，若是句子长度比较大(如本例中可以取文本长度为1024或者更大)，RNN虽然会花费更多的时间，但仍然能够完成前向传播，而Transformer会直接因为内存不足而不能进行前向传播。
+
+## 值得一提的学习心得
+- 词典的构建会花费大量的时间，建议将构建好的词典存储为文件方便读取。
+- 构建词典时，将仅出现了一次的单词进行剔除，有可能是拼错的单词、网络语言或者无意义的符号等，对理解语义没有实际的意义，并且降低了词典的大小，加快dataset的构建。
+- 由于每个样本的文本长度不同，需要统一为一个长度，代码中将其设为超参`max_phrase_size`，若是max_phrase_size的值选取的太大，会有很多的样本填充大量的'PAD'，会导致模型特别难以收敛，很多个Epoch之后甚至测试集和训练集准确率不会产生变化。若选取的值太小，又会导致没有涵盖样本的大部分内容，舍弃了大量有价值的文本信息，会影响模型的准确率。
+- torch.nn.RNN()在前向传播时，可以省略hidden向量的传值，pytorch会根据创建RNN模型时传入的维度初始化一个全零的高维Tensor。
+- wordcloud.WordCloud对象创建时，默认会使用wordcloud内置的停用词表。可以使用`print(wordcloud.STOPWORDS)`进行查看。
+
+## 值得尝试的改变
+- 使用GloVe训练好的embedding代替使用torch.nn.Embedding，可能会有更好的效果，不过要求Embedding Coverage rate较高，否则会填充大量的UNK字符影响训练。
+- Transformer模型使用feature之间的Attention计算。
+- 对文本进行更加合理的预处理，取出无意义的单词，使得模型能够处理更能决定样本感情倾向的单词。
+- 对max_phrase_size的选取有待进一步的实验。
+
+## 文件描述
+文件名|描述|
+------|---|
+dict|存储构建好的词典|
+font|结果可视化图中记录相关信息的字体文件|
+image|存储词云|
+module|存储使用到的模型|
+result_figure|存储实验得到的结果图|
+utils/build_dataset.py|根据词典构建数据集|
+utils/build_dict.py|构建词典，独立运行|
+utils/build_glove_embeddind_dict.py|构建GloVe词嵌入的字典，键值对为`单词：向量`|
+utils/clean_line.py|文本清理的函数，自定义文本清理的方法，可修改这里|
+utils/cover_rate.py|计算单词覆盖率|
+utils/random_seed.py|设置随机种子|
+utils/visualization_for_RNN.py|RNN模型结果可视化函数|
+utils/visualization_for_Transformer.py|Transformer模型结果可视化函数|
+utils/wordcloud_util.py|绘制词云|
+run_with_RNN.py|使用RNN模型进行训练|
+run_with_transformer.py|使用Transformer模型进行训练|
+
+
+
+
+
+
+
+
