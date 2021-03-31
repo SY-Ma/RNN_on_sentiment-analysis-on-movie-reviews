@@ -5,6 +5,17 @@
 前一段时间对RNN有了比较基础的了解，希望通过简单的实例来巩固对RNN的理解，希望通过实验了解RNN模型的特点，了解NLP的基本的过程，如构建字典、构建数据集，词嵌入等，并将RNN模型与Transformer模型进行对比，了解优劣。停用词的选择和模型的准确率还有很多提升的空间和方法，但本实验将不再尝试。<br>
 对RNN的基本使用与小练习：https://github.com/SY-Ma/RNN_demo
 
+## 实验结果
+模型|测试集准确率|训练集准确率|
+----|-----------|-----------|
+RNN|89.88%|99.87%|
+Transformer|85.68%|99.57%|
+
+- RNN模型的准确率略胜一筹，当然本人在实验时将大量的实验时间花在了RNN模型上，对模型的参数调整花了比较多的时间，也是为了能够更加了解RNN一些，在Transformer模型的参数调整和模型的微调上还有待更多的的实验。
+- 两个模型均存在严重的过拟合。
+- RNN网络中，使用LSTM模块、使用多层RNN网络、使用双向循环神经网络均会使训练时间大幅度增加，相比较而言，Transformer模型的训练速度较快。当然这是建立在处理的句子长度在计算机的计算能力之内的情况下，若是句子长度比较大(如本例中可以取文本长度为1024或者更大)，RNN虽然会花费更多的时间，但仍然能够完成前向传播，而Transformer会直接因为内存不足而不能进行前向传播。
+
+
 ## 实验环境
 环境|描述|
 ----|----|
@@ -85,8 +96,6 @@ For more dataset information, please go through the following link:
 ```
 
 ### 文本预处理效果评估
-
-预处理过程参考kaggle帖子：https://www.kaggle.com/harshalgadhe/imdb-sentiment-classifier-97-accuracy-model#Model-Evaluation <br>
 - Embedding Coverage
 首先我们进行单词覆盖率的计算，我们使用GloVe预训练embedding向量词表，关于GloVe的介绍和词表的下载参考网址：https://nlp.stanford.edu/projects/glove/ <br>
 以我的理解，计算覆盖率旨在判断经过单词的分割和预处理之后单词是否完整、正确。GloVe含有常用的英文单词，覆盖比率表示经过预处理后得到的单词有多少是在GloVe中存在的。
@@ -116,17 +125,6 @@ self.rnn = torch.nn.LSTM(input_size=d_embedding, hidden_size=d_hidden, num_layer
 - 输入为二维向量，首先经过Embedding层将每个时间步变成稠密向量，维度变为`(batch_size, time_step, d_embedding)`。
 - 经过Encoder栈，对每个时间步进行attention计算。
 - 最后经过线性层，将输出映射为类别维度。
-
-
-## 实验结果
-模型|测试集准确率|训练集准确率|
-----|-----------|-----------|
-RNN|89.88%|99.87%|
-Transformer|85.68%|99.57%|
-
-- RNN模型的准确率略胜一筹，当然本人在实验时将大量的实验时间花在了RNN模型上，对模型的参数调整花了比较多的时间，也是为了能够更加了解RNN一些，在Transformer模型的参数调整和模型的微调上还有待更多的的实验。
-- 两个模型均存在严重的过拟合。
-- RNN网络中，使用LSTM模块、使用多层RNN网络、使用双向循环神经网络均会使训练时间大幅度增加，相比较而言，Transformer模型的训练速度较快。当然这是建立在处理的句子长度在计算机的计算能力之内的情况下，若是句子长度比较大(如本例中可以取文本长度为1024或者更大)，RNN虽然会花费更多的时间，但仍然能够完成前向传播，而Transformer会直接因为内存不足而不能进行前向传播。
 
 ## 值得一提的学习心得
 - 词典的构建会花费大量的时间，建议将构建好的词典存储为文件方便读取。
@@ -161,9 +159,13 @@ utils/wordcloud_util.py|绘制词云|
 run_with_RNN.py|使用RNN模型进行训练|
 run_with_transformer.py|使用Transformer模型进行训练|
 
+## 参考
+预处理过程参考kaggle帖子：<https://www.kaggle.com/harshalgadhe/imdb-sentiment-classifier-97-accuracy-model#Model-Evaluation> <br>
+wordcloud使用：<https://blog.csdn.net/skylibiao/article/details/89702746> <br>
+RNN基础运用和维度的理解：<https://github.com/SY-Ma/RNN_demo> <br>
 
-
-
+## 本人学识浅薄，代码和文字若有不当之处欢迎批评与指正！
+## 联系方式：masiyuan007@qq.com
 
 
 
