@@ -29,6 +29,7 @@ For more dataset information, please go through the following link:
 数据集下载路径：https://www.kaggle.com/lakshmi25npathi/imdb-dataset-of-50k-movie-reviews
 
 ## 数据预处理
+
 ### 数据探索
 下载数据集文件为`.csv`文件，使用pandas读取数据集，仅显示前五行的输出如下：
 ```
@@ -43,9 +44,7 @@ For more dataset information, please go through the following link:
 
 - 对于评论内容，我们将数据进行按行取出，文本为英文文本，无需进行分词操作，使用`空格`对单词进行划分。我们使用wordcloud对文本内容进行初步的探索。在此需要注意的是，我们为了能够很好的训练模型，我们将5万条数据分割为训练集4万条，测试集1万条。因此得到的训练集和测试集的词云效果图如下：
 
-
-
-我们将单词出现的次数进行量化，取出现次数最多的前十个词如下：<br>
+我们将单词出现的次数进行量化，取出现次数最多的前二十个词如下：<br>
 
 训练集：
 排序|文本内容|次数|排序|文本内容|次数|排序|文本内容|次数|排序|文本内容|次数|
@@ -88,11 +87,27 @@ For more dataset information, please go through the following link:
 ### 文本预处理效果评估
 
 预处理过程参考kaggle帖子：https://www.kaggle.com/harshalgadhe/imdb-sentiment-classifier-97-accuracy-model#Model-Evaluation <br>
-
-首先我们通过简陋的方法讲文本按条取出，按照`空格`进行分割，
-
+- Embedding Coverage
 首先我们进行单词覆盖率的计算，我们使用GloVe预训练embedding向量词表，关于GloVe的介绍和词表的下载参考网址：https://nlp.stanford.edu/projects/glove/ <br>
-以我的理解，计算覆盖率旨在判断
+以我的理解，计算覆盖率旨在判断经过单词的分割和预处理之后单词是否完整、正确。GloVe含有常用的英文单词，覆盖比率表示经过预处理后得到的单词有多少是在GloVe中存在的。
+- UNK rate
+大量相同的UNK填充会导致模型难以收敛，创建字典是可以限制低频词的加入，若限制过于严谨(如必须出现5次以上才可以加入词典)，会导致文本向量化时出现大量的UNK字符，对于模型的训练产生影响。
 
+模型在预处理之后的Embedding Coverage和UNK rate如下：
+```
+训练集：UNK_rate=1.44%   字典覆盖率: 0.4351    文本覆盖率: 0.97939
+测试集：UNK_rate=2.01%   字典覆盖率: 0.52597   文本覆盖率: 0.97493
+```
+- 经过文本处理之后的云图显示（训练集左，测试集右）：
 
-###
+## 模型描述
+
+### RNN
+- 使用LSTM进行训练和测试，在进入模型之后第一步进行embedding词嵌入操作，并将`PAD`设为零向量。
+- 具体创建LSTM语句如下：
+```
+self.rnn = torch.nn.LSTM(input_size=d_embedding, hidden_size=d_hidden, num_layers=num_layers, batch_first=True,
+                                 dropout=dropout, bidirectional=True)
+```
+- 对最后一次
+### Transformer
