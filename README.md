@@ -53,7 +53,10 @@ For more dataset information, please go through the following link:
 ```
 - 可见对于每一条数据，包括评论和标签，其中评论和标签均为字符串，我们按列取出评论内容和标签内容。首先通过遍历将标签转化为数值，在这里我们将positive=1，negative=0。<br>
 
-- 对于评论内容，我们将数据进行按行取出，文本为英文文本，无需进行分词操作，使用`空格`对单词进行划分。我们使用wordcloud对文本内容进行初步的探索。在此需要注意的是，我们为了能够很好的训练模型，我们将5万条数据分割为训练集4万条，测试集1万条。因此得到的训练集和测试集的词云效果图如下：
+- 对于评论内容，我们将数据进行按行取出，文本为英文文本，无需进行分词操作，使用`空格`对单词进行划分。我们使用wordcloud对文本内容进行初步的探索。在此需要注意的是，我们为了能够很好的训练模型，我们将5万条数据分割为训练集4万条，测试集1万条。因此得到的训练集(左)和测试集(右)的词云效果图如下：
+
+![load error!](https://github.com/SY-Ma/RNN_on_sentiment-analysis-on-movie-reviews/blob/main/RNN_on_sentiment-analysis-on-movie-reviews/image/train%20before%20clean.png)
+![load error!](https://github.com/SY-Ma/RNN_on_sentiment-analysis-on-movie-reviews/blob/main/RNN_on_sentiment-analysis-on-movie-reviews/image/test%20before%20clean.png)
 
 我们将单词出现的次数进行量化，取出现次数最多的前二十个词如下：<br>
 
@@ -108,6 +111,9 @@ For more dataset information, please go through the following link:
 测试集：UNK_rate=2.01%   字典覆盖率: 0.52597   文本覆盖率: 0.97493
 ```
 - 经过文本处理之后的云图显示（训练集左，测试集右）：
+
+![load error!](https://github.com/SY-Ma/RNN_on_sentiment-analysis-on-movie-reviews/blob/main/RNN_on_sentiment-analysis-on-movie-reviews/image/train%20after%20clean_2.png)
+![load error!](https://github.com/SY-Ma/RNN_on_sentiment-analysis-on-movie-reviews/blob/main/RNN_on_sentiment-analysis-on-movie-reviews/image/test%20after%20clean_2.png)
 
 ## 模型描述
 **tip:模型并不复杂,可以参见代码**
